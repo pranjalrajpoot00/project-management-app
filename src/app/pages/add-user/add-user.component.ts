@@ -24,9 +24,11 @@ export class AddUserComponent {
   // Switch between tabs
   activeTab = 'add'; // Default tab
 
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-  }
+  switchTab(tab: string) {
+    console.log(`${tab}`)
+    this.router.navigate([`/${tab}`]);
+    // In a real application, you would handle tab switching logic
+}
 
   onSubmit() {
     // Add the logic to send data to the server (via a service)
@@ -50,4 +52,13 @@ export class AddUserComponent {
     // Logic to add another user after the success
     this.user = { name: '', username: '', password: '', role: '' };
   }
+
+  logout(): void {
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.removeItem('currentUser');
+      this.router.navigate(['/login']);
+    }
+  }
 }
+
+

@@ -34,7 +34,8 @@ export class ManageUsersComponent {
     }
 
     switchTab(tab: string) {
-        console.log(`Switching to tab: ${tab}`);
+        console.log(`${tab}`)
+        this.router.navigate([`/${tab}`]);
         // In a real application, you would handle tab switching logic
     }
 
@@ -54,6 +55,6 @@ export class ManageUsersComponent {
     logout() {
         console.log('Logging out...');
         // In a real application, you would handle the logout process
-        // this.router.navigate(['/login']);
+        this.router.navigate(['/login']);
     }
 }

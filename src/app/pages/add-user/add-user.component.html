@@ -45,9 +45,9 @@
 
 <div class="tab-container">
     <div class="tabs">
-        <button class="tab active" (click)="setActiveTab('add')">Add new user</button>
-        <button class="tab" (click)="setActiveTab('activity')">Activity monitoring</button>
-        <button class="tab" (click)="setActiveTab('manage')">Manage users</button>
+        <button class="tab active" (click)="switchTab('add-users')">Add new user</button>
+        <button class="tab" (click)="switchTab('activity-monitoring')">Activity monitoring</button>
+        <button class="tab" (click)="switchTab('manage-users')">Manage users</button>
     </div>
 </div>
 
@@ -92,4 +92,15 @@
         <h2 class="modal-title">User added</h2>
         <button class="modal-btn" (click)="addAnotherUser()">Add another user</button>
     </div>
+</div>
+
+<div class="footer">
+    <a href="#" class="logout-btn" (click)="logout()">
+        Log out
+        <svg class="logout-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+    </a>
 </div>

@@ -39,16 +39,10 @@ export class ActivityMonitoringComponent implements OnInit {
     // }
   }
 
-  switchTab(tab: string): void {
-    switch (tab) {
-      case 'add':
-        this.router.navigate(['/add-user']);
-        break;
-      case 'manage':
-        this.router.navigate(['/manage-users']);
-        break;
-    }
-  }
+  switchTab(tab: string) {
+    console.log(`${tab}`)
+    this.router.navigate([`/${tab}`]);
+}
 
   navigateTo(route: string): void {
     this.router.navigate([`/${route}`]);

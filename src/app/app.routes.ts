@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { ActivityMonitoringComponent } from './pages/activity-monitoring/activity-monitoring.component';
-import { ManageUsersComponent } from './pages/pages/manage-users/manage-users.component';
+import { ManageUsersComponent } from './pages/manage-users/manage-users.component';
 import { DashboardComponent } from './pages/pages/dashboard/dashboard.component';
 import { YourProjectsComponent } from './pages/pages/your-projects/your-projects.component';
 import { SelectProjectComponent } from './pages/pages/select-project/select-project.component';
