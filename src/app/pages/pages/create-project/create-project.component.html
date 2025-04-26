@@ -1,0 +1,112 @@
+<!-- Header -->
+<header>
+    <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="18" fill="#fff"/>
+            <path d="M20,2 L20,38 M2,20 L38,20" stroke="#1e3671" stroke-width="3"/>
+            <path d="M9,9 L31,31 M9,31 L31,9" stroke="#1e3671" stroke-width="3"/>
+        </svg>
+        <div class="logo-text">
+            <span class="logo-title">Pratt & Whitney</span>
+            <span class="logo-subtitle">An RTX Business</span>
+        </div>
+    </div>
+    <div class="user-info">
+        <svg width="30" height="30" viewBox="0 0 30 30">
+            <circle cx="15" cy="15" r="14" fill="#fff" stroke="#1e3671"/>
+            <circle cx="15" cy="10" r="5" fill="#fff" stroke="#1e3671"/>
+            <path d="M5,30 Q15,20 25,30" fill="#fff" stroke="#1e3671"/>
+        </svg>
+        <div>
+            <div class="user-name">Sagar</div>
+            <div class="user-role">PM</div>
+        </div>
+    </div>
+</header>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+    <a href="#"><span class="icon">🏠</span> Home</a>
+    <span>></span>
+    <a href="#">project management</a>
+    <span>></span>
+    <span>Add project</span>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <a href="#" title="Menu"><span class="icon">☰</span></a>
+    <a href="#" title="Users"><span class="icon">👥</span></a>
+    <a href="#" title="Calendar"><span class="icon">📅</span></a>
+    <a href="#" title="Help"><span class="icon">❓</span></a>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-navigation">
+    <button [class.active]="activeTab === 'project'" (click)="setActiveTab('project')">Project Management</button>
+    <button [class.active]="activeTab === 'resource'" (click)="setActiveTab('resource')">Resource Management</button>
+    <div class="tab-pointer" [style.left]="activeTab === 'project' ? '190px' : '390px'"></div>
+</div>
+
+<!-- Home Button -->
+<a href="#" class="home-btn">
+    <span class="icon">🏠</span> Home
+</a>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h1>NEW PROJECT</h1>
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="project-name">Name of the Project :</label>
+            <input type="text" id="project-name" formControlName="projectName">
+        </div>
+        <div class="form-group">
+            <label for="start-date">Start date :</label>
+            <input type="text" id="start-date" formControlName="startDate">
+            <span class="icon" style="margin-left: -30px;">📅</span>
+        </div>
+        <div class="form-group">
+            <label for="end-date">End date :</label>
+            <input type="text" id="end-date" formControlName="endDate">
+            <span class="icon" style="margin-left: -30px;">📅</span>
+        </div>
+        
+        <div *ngFor="let member of teamMembers; let i = index" class="form-group">
+            <label for="member-{{i}}">Member {{i + 1}} :</label>
+            <div class="member-info">
+                <span class="member-name">{{member.name}}</span>
+                <span class="member-role">{{member.role}}</span>
+                <span class="remove-member" (click)="removeMember(i)">×</span>
+            </div>
+        </div>
+        
+        <button type="button" class="add-member-btn" (click)="openAddMemberDialog()">
+            Add a team member <span class="icon">▼</span>
+        </button>
+        <button type="submit" class="submit-btn">Add project</button>
+    </form>
+</div>
+
+<!-- Back Button -->
+<a href="#" class="back-btn">
+    <span class="icon">◀</span>
+</a>
+
+<!-- Footer -->
+<footer>
+    <a href="#">Log out <span class="icon">↪</span></a>
+</footer>
+
+<!-- Success Modal -->
+<div class="modal" [style.display]="showModal ? 'flex' : 'none'">
+    <div class="modal-content">
+        <span class="close-modal" (click)="closeModal()">×</span>
+        <p class="modal-title">
+            <span class="success-icon">✓</span>
+            Your new project {{projectForm.get('projectName')?.value}} has been added
+        </p>
+        <p class="modal-info">Starts from: {{projectForm.get('startDate')?.value}}</p>
+        <p class="modal-info">Ends on: {{projectForm.get('endDate')?.value}}</p>
+    </div>
+</div>

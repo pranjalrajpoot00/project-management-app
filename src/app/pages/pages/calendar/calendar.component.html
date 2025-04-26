@@ -1,0 +1,90 @@
+<header class="header">
+    <div class="logo-container">
+        <img src="/api/placeholder/40/40" alt="Pratt & Whitney Logo" class="logo">
+        <div>
+            <div class="company-name">Pratt & Whitney</div>
+            <div class="company-subtitle">An RTX Business</div>
+        </div>
+    </div>
+    <div class="user-info">
+        <div class="user-avatar">
+            <span class="icon avatar-icon"></span>
+        </div>
+        <div>
+            <div class="user-name">Sagar</div>
+            <div class="user-role">PM</div>
+        </div>
+    </div>
+</header>
+
+<nav class="breadcrumb">
+    <a href="#"><span class="icon home-icon" style="width: 16px; height: 16px;"></span></a>
+    <span>&gt;</span>
+    <a href="#">Calender</a>
+</nav>
+
+<aside class="sidebar">
+    <div class="sidebar-icon">
+        <span class="icon list-icon"></span>
+    </div>
+    <div class="sidebar-icon">
+        <span class="icon user-icon"></span>
+    </div>
+    <div class="sidebar-icon active">
+        <span class="icon calendar-icon"></span>
+    </div>
+    <div class="sidebar-icon">
+        <span class="icon help-icon"></span>
+    </div>
+</aside>
+
+<button class="home-button" (click)="goToHome()">
+    <span class="icon home-icon"></span>
+    Home
+</button>
+
+<main class="main-content">
+    <h1 class="page-title">CALENDER</h1>
+    
+    <div class="calendar-container">
+        <div class="calendar-navigation">
+            <button class="calendar-nav-button" (click)="previousMonth()">
+                <span class="icon arrow-left"></span> Previous
+            </button>
+            <div class="calendar-month-year">{{ currentMonth }} {{ currentYear }}</div>
+            <button class="calendar-nav-button" (click)="nextMonth()">
+                Next <span class="icon arrow-right"></span>
+            </button>
+        </div>
+        <table class="calendar-grid">
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let week of calendar">
+                    <td *ngFor="let day of week" [class.other-month]="day.isOtherMonth" [class.today]="isToday(day)">
+                        <div class="calendar-date">{{ day.date }}</div>
+                        <div *ngFor="let event of day.events" class="calendar-event" (click)="showEventDetails(event)">
+                            {{ event.title }}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer class="footer">
+    <button class="logout-button" (click)="logout()">
+        Log out
+        <span class="icon logout-icon" style="margin-left: 8px;"></span>
+    </button>
+</footer>

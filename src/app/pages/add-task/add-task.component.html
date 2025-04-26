@@ -1,0 +1,184 @@
+<div class="header">
+    <div class="logo">
+        <img src="/api/placeholder/150/50" alt="Pratt & Whitney">
+        <div>
+            <div class="logo-text">Pratt & Whitney</div>
+            <div class="logo-subtext">An RTX Business</div>
+        </div>
+    </div>
+    <div class="user-info">
+        <div class="user-icon">
+            <i class="fas fa-user"></i>
+        </div>
+        <div>
+            <div>Sagar</div>
+            <div style="font-size: 12px;">PM</div>
+        </div>
+    </div>
+</div>
+
+<div class="breadcrumb">
+    <i class="fas fa-home"></i> <a href="#">Home</a> > Project Management
+</div>
+
+<div class="navigation">
+    <div class="tabs">
+        <a class="tab" [class.active]="activeTab === 'Project Management'" (click)="setActiveTab('Project Management')">Project Management</a>
+        <a class="tab" [class.active]="activeTab === 'Resource Management'" (click)="setActiveTab('Resource Management')">Resource Management</a>
+    </div>
+    <a href="#" class="home-btn">
+        <i class="fas fa-home"></i> Home
+    </a>
+</div>
+
+<h1 class="page-title">I4.0 TPM</h1>
+
+<div class="tasks-container">
+    <table class="tasks-table">
+        <thead>
+            <tr>
+                <th>Task Name</th>
+                <th>Desc</th>
+                <th>Starts</th>
+                <th>Due date</th>
+                <th>Role</th>
+                <th>Assignee</th>
+                <th>Hours</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let task of tasks">
+                <td>{{ task.name }}</td>
+                <td><i class="fas fa-file file-icon"></i></td>
+                <td>{{ task.starts }}</td>
+                <td>{{ task.due }}</td>
+                <td>{{ task.role }}</td>
+                <td>{{ task.assignee }}</td>
+                <td>{{ task.hours }}</td>
+                <td>
+                    <span class="status" [ngClass]="{
+                        'status-completed': task.status === 'Completed',
+                        'status-review': task.status === 'In review',
+                        'status-testing': task.status === 'In testing',
+                        'status-progress': task.status === 'In progress'
+                    }">{{ task.status }}</span>
+                </td>
+                <td class="action-icons">
+                    <a href="#" (click)="editTask(task.id); $event.preventDefault()">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <a href="#" (click)="openCommentModal(task.id); $event.preventDefault()">
+                        <i class="fas fa-comment"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<a href="#" class="add-task-btn" (click)="showAddTaskForm(); $event.preventDefault()">Add Task</a>
+
+<a href="#" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+</a>
+
+<div class="footer">
+    <a href="#" class="logout-btn">
+        Log out <i class="fas fa-sign-out-alt"></i>
+    </a>
+</div>
+
+<!-- Add Task Form Overlay -->
+<div class="overlay" [style.display]="isAddTaskVisible ? 'flex' : 'none'" (click)="onOverlayClick($event)">
+    <div class="add-task-form">
+        <h2>Add new task</h2>
+        
+        <div class="form-row">
+            <label>Task Name</label>
+            <span>:</span>
+            <input type="text" [(ngModel)]="newTask.name">
+        </div>
+        
+        <div class="form-row">
+            <label>Description</label>
+            <span>:</span>
+            <textarea [(ngModel)]="newTask.description"></textarea>
+        </div>
+        
+        <div class="form-row">
+            <label>Start date</label>
+            <span>:</span>
+            <input type="date" [(ngModel)]="newTask.startDate">
+        </div>
+        
+        <div class="form-row">
+            <label>Due date</label>
+            <span>:</span>
+            <input type="date" [(ngModel)]="newTask.dueDate">
+        </div>
+        
+        <div class="form-row">
+            <label>Role</label>
+            <span>:</span>
+            <select [(ngModel)]="newTask.role">
+                <option value="">Select role</option>
+                <option value="Lead">Lead</option>
+                <option value="UI/UX">UI/UX</option>
+                <option value="Frontend">Frontend</option>
+                <option value="Backend">Backend</option>
+                <option value="QA">QA</option>
+            </select>
+        </div>
+        
+        <div class="form-row">
+            <label>Assignee</label>
+            <span>:</span>
+            <select [(ngModel)]="newTask.assignee">
+                <option value="">Select assignee</option>
+                <option value="Tejas">Tejas</option>
+                <option value="Kritika">Kritika</option>
+                <option value="Pranjal">Pranjal</option>
+                <option value="Sagar">Sagar</option>
+            </select>
+        </div>
+        
+        <button class="ok-button" (click)="addNewTask()">OK</button>
+    </div>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal" [style.display]="isCommentModalVisible ? 'flex' : 'none'">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Task Comments</h2>
+            <span class="close-btn" (click)="hideCommentModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3>{{ currentTaskName }}</h3>
+            <div class="comments-section">
+                <div class="comments-list">
+                    <div *ngIf="currentTaskComments.length === 0">
+                        <p>No comments yet.</p>
+                    </div>
+                    <div class="comment" *ngFor="let comment of currentTaskComments">
+                        <div class="comment-header">
+                            <span>{{ comment.author }}</span>
+                            <span>{{ comment.date }}</span>
+                        </div>
+                        <div class="comment-body">{{ comment.text }}</div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Add Comment</label>
+                    <textarea class="form-control" [(ngModel)]="newComment" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="hideCommentModal()">Close</button>
+            <button class="btn btn-primary" (click)="addComment()">Add Comment</button>
+        </div>
+    </div>
+</div>
