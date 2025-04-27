@@ -15,12 +15,12 @@ export class DashboardComponent {
   navigateTo(page: string) {
     console.log(`Navigating to ${page} page...`);
     // In a real application, you would navigate to the appropriate page
-    // this.router.navigate([`/${page}`]);
+    this.router.navigate([`/${page}`]);
   }
 
   logout() {
     console.log('Logging out...');
     // In a real application, you would handle the logout process
-    // this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 }

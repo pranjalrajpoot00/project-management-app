@@ -1,11 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-interface User {
-    name: string;
-    role: string;
-}
+import { UserService, User } from '../../services/user.service';
 
 @Component({
     selector: 'app-manage-users',
@@ -14,47 +10,49 @@ interface User {
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.css'
 })
-export class ManageUsersComponent {
-    users: User[] = [
-        { name: 'Sagar', role: 'PM' },
-        { name: 'Drishya', role: 'Lead' },
-        { name: 'Tejas', role: 'Lead' },
-        { name: 'Muskan', role: 'PM' },
-        { name: 'Pranjal', role: 'Developer' },
-        { name: 'Kritika', role: 'Developer' },
-        { name: 'Ninaad', role: 'Developer' }
-    ];
+export class ManageUsersComponent implements OnInit {
+    users: User[] = [];
 
-    constructor(private router: Router) {}
+    constructor(
+        private router: Router,
+        private userService: UserService
+    ) {}
+
+    ngOnInit() {
+        this.userService.getUsers().subscribe(users => {
+            this.users = users;
+        });
+    }
 
     navigateTo(page: string) {
         console.log(`Navigating to ${page} page...`);
-        // In a real application, you would navigate to the appropriate page
-        // this.router.navigate([`/${page}`]);
+        this.router.navigate([`/${page}`]);
     }
 
     switchTab(tab: string) {
-        console.log(`${tab}`)
+        console.log(`${tab}`);
         this.router.navigate([`/${tab}`]);
-        // In a real application, you would handle tab switching logic
     }
 
     editUser(user: User) {
-        console.log('Edit user:', user.name);
-        // In a real application, you would open an edit modal or navigate to edit page
+        const index = this.users.findIndex(u => u.username === user.username);
+        if (index !== -1) {
+            this.userService.setEditMode(index);
+            this.router.navigate(['/add-users']);
+        }
     }
 
     deleteUser(user: User) {
         if (confirm(`Are you sure you want to delete user: ${user.name}?`)) {
-            console.log('Deleting user:', user.name);
-            // In a real application, you would handle the deletion logic
-            this.users = this.users.filter(u => u.name !== user.name);
+            const index = this.users.findIndex(u => u.username === user.username);
+            if (index !== -1) {
+                this.userService.deleteUser(index);
+            }
         }
     }
 
     logout() {
         console.log('Logging out...');
-        // In a real application, you would handle the logout process
         this.router.navigate(['/login']);
     }
 }

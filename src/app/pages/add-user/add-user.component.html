@@ -1,23 +1,6 @@
 <div class="header">
     <div class="logo-container">
-        <!-- Logo and company name -->
-        <svg class="logo" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="25" cy="25" r="20" fill="white" />
-            <g stroke="white" stroke-width="1.5">
-                <line x1="25" y1="5" x2="25" y2="0" />
-                <line x1="32" y1="7" x2="35" y2="3" />
-                <line x1="37" y1="13" x2="42" y2="10" />
-                <line x1="39" y1="20" x2="45" y2="20" />
-                <line x1="37" y1="27" x2="42" y2="30" />
-                <line x1="32" y1="33" x2="35" y2="37" />
-                <line x1="25" y1="35" x2="25" y2="40" />
-                <line x1="18" y1="33" x2="15" y2="37" />
-                <line x1="13" y1="27" x2="8" y2="30" />
-                <line x1="11" y1="20" x2="5" y2="20" />
-                <line x1="13" y1="13" x2="8" y2="10" />
-                <line x1="18" y1="7" x2="15" y2="3" />
-            </g>
-        </svg>
+        <img src="/logo.png" alt="Pratt & Whitney Logo" class="logo">
         <div>
             <div class="company-name">Pratt & Whitney</div>
             <div class="subtitle">An RTX Business</div>
@@ -53,7 +36,7 @@
 
 <div class="content">
     <div class="form-container">
-        <h2 class="form-title">Add new user</h2>
+        <h2 class="form-title">{{ isEditing ? 'Edit User' : 'Add new user' }}</h2>
         <form (ngSubmit)="onSubmit()">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Enter name" [(ngModel)]="user.name" name="name" required>
@@ -73,7 +56,7 @@
                 </select>
             </div>
             <div class="btn-container">
-                <button class="btn" type="submit">Add user</button>
+                <button class="btn" type="submit">{{ isEditing ? 'Update User' : 'Add User' }}</button>
             </div>
         </form>
     </div>
@@ -89,8 +72,8 @@
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
         </div>
-        <h2 class="modal-title">User added</h2>
-        <button class="modal-btn" (click)="addAnotherUser()">Add another user</button>
+        <h2 class="modal-title">{{ isEditing ? 'User Updated' : 'User Added' }}</h2>
+        <button class="modal-btn" (click)="addAnotherUser()">{{ isEditing ? 'Back to Users' : 'Add Another User' }}</button>
     </div>
 </div>
 

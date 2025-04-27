@@ -1,10 +1,6 @@
 <header class="header">
     <div class="logo-container">
-        <img src="/api/placeholder/40/40" alt="Pratt & Whitney Logo" class="logo">
-        <div>
-            <div class="company-name">Pratt & Whitney</div>
-            <div class="company-subtitle">An RTX Business</div>
-        </div>
+        <img src="/logo.png" alt="Pratt & Whitney Logo" class="logo">
     </div>
     <div class="user-info">
         <div class="user-avatar">
@@ -59,3 +55,41 @@
         <span class="icon logout-icon" style="margin-left: 8px;"></span>
     </button>
 </footer>
+
+<!-- Project Details Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ selectedProject?.name }}</h2>
+            <span class="status-badge" [ngClass]="'status-' + selectedProject?.status?.toLowerCase()">
+                {{ selectedProject?.status }}
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="project-info">
+                <div class="info-group">
+                    <label>Description:</label>
+                    <p>{{ selectedProject?.description }}</p>
+                </div>
+                <div class="info-group">
+                    <label>Start Date:</label>
+                    <p>{{ selectedProject?.startDate }}</p>
+                </div>
+                <div class="info-group">
+                    <label>End Date:</label>
+                    <p>{{ selectedProject?.endDate }}</p>
+                </div>
+                <div class="info-group">
+                    <label>Team Members:</label>
+                    <ul>
+                        <li *ngFor="let member of selectedProject?.teamMembers">{{ member }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-button" (click)="navigateToAddTask()">Assign Task</button>
+            <button class="action-button" (click)="closeModal()">Close</button>
+        </div>
+    </div>
+</div>

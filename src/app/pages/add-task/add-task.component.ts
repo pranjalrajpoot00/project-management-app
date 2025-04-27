@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 interface Task {
   id: number;
+  projectId: string;
   name: string;
   description: string;
   starts: string;
@@ -24,6 +26,14 @@ interface Comment {
   text: string;
 }
 
+interface Resource {
+  name: string;
+  eid: string;
+  role: string;
+  hours: number;
+  assignedTasks: Task[];
+}
+
 @Component({
   selector: 'app-add-task',
   standalone: true,
@@ -34,6 +44,53 @@ interface Comment {
 export class AddTaskComponent implements OnInit {
   // Task data
   tasks: Task[] = [];
+  currentProject: any = null;
+  
+  // Resource data
+  resources: Resource[] = [
+    {
+      name: 'Sagar',
+      eid: 'E40096601',
+      role: 'PM',
+      hours: 80,
+      assignedTasks: []
+    },
+    {
+      name: 'Tejas',
+      eid: 'E40096602',
+      role: 'Lead',
+      hours: 100,
+      assignedTasks: []
+    },
+    {
+      name: 'Kritika',
+      eid: 'E40096603',
+      role: 'Developer',
+      hours: 30,
+      assignedTasks: []
+    },
+    {
+      name: 'Tejaswini',
+      eid: 'E40096604',
+      role: 'Developer',
+      hours: 40,
+      assignedTasks: []
+    },
+    {
+      name: 'Thayib',
+      eid: 'E40096605',
+      role: 'Developer',
+      hours: 60,
+      assignedTasks: []
+    },
+    {
+      name: 'Pranjal',
+      eid: 'E40096606',
+      role: 'Developer',
+      hours: 30,
+      assignedTasks: []
+    }
+  ];
   
   // UI state
   activeTab: string = 'Project Management';
@@ -56,70 +113,46 @@ export class AddTaskComponent implements OnInit {
   currentTaskComments: Comment[] = [];
   newComment: string = '';
   
-  constructor() { }
+  constructor(public router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      this.currentProject = navigation.extras.state['project'];
+    }
+  }
   
   ngOnInit(): void {
     this.loadInitialData();
   }
   
   loadInitialData(): void {
-    // Initial data
-    this.tasks = [
-      {
-        id: 1,
-        name: "User Story",
-        description: "Create user stories for the new feature",
-        starts: "03-02-25",
-        due: "10-02-25",
-        role: "Lead",
-        assignee: "Tejas",
-        hours: "48 h",
-        status: "Completed",
-        comments: [
-          { author: "Sagar", date: "05-02-25", text: "Great work on this! Ready for the next phase." }
-        ]
-      },
-      {
-        id: 2,
-        name: "Add Ribbon",
-        description: "Design and implement the ribbon component",
-        starts: "10-02-25",
-        due: "20-02-25",
-        role: "UI/UX",
-        assignee: "Kritika",
-        hours: "64 h",
-        status: "In review",
-        comments: [
-          { author: "Kritika", date: "18-02-25", text: "Design completed, ready for review." }
-        ]
-      },
-      {
-        id: 3,
-        name: "Dashboard",
-        description: "Create the main dashboard interface",
-        starts: "30-03-25",
-        due: "20-04-25",
-        role: "Frontend",
-        assignee: "Pranjal",
-        hours: "96 h",
-        status: "In testing",
-        comments: []
-      },
-      {
-        id: 4,
-        name: "JIRA Tickets",
-        description: "Create JIRA tickets for sprint planning",
-        starts: "10-02-25",
-        due: "15-02-25",
-        role: "Lead",
-        assignee: "Tejas",
-        hours: "32 h",
-        status: "In progress",
-        comments: [
-          { author: "Tejas", date: "12-02-25", text: "Working on creating all tickets, 60% done." }
-        ]
+    // Load tasks from localStorage if available
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      const allTasks = JSON.parse(savedTasks);
+      // Filter tasks for current project
+      if (this.currentProject) {
+        this.tasks = allTasks.filter((task: Task) => task.projectId === this.currentProject.name);
+        // Update resource assignments
+        this.updateResourceAssignments();
       }
-    ];
+    } else {
+      this.tasks = [];
+    }
+  }
+  
+  updateResourceAssignments(): void {
+    // Reset all resource assignments
+    this.resources.forEach(resource => {
+      resource.assignedTasks = [];
+    });
+    
+    // Assign tasks to resources
+    this.tasks.forEach(task => {
+      const resource = this.resources.find(r => r.name === task.assignee);
+      if (resource) {
+        resource.assignedTasks.push(task);
+      }
+    });
   }
   
   setActiveTab(tab: string): void {
@@ -154,7 +187,7 @@ export class AddTaskComponent implements OnInit {
   
   addNewTask(): void {
     if (!this.newTask.name || !this.newTask.startDate || !this.newTask.dueDate || !this.newTask.role || !this.newTask.assignee) {
-      // In a real application, you would add validation and error messages
+      alert('Please fill in all required fields');
       return;
     }
     
@@ -177,6 +210,7 @@ export class AddTaskComponent implements OnInit {
     
     const task: Task = {
       id: newId,
+      projectId: this.currentProject.name,
       name: this.newTask.name,
       description: this.newTask.description || '',
       starts: startFormatted,
@@ -184,11 +218,25 @@ export class AddTaskComponent implements OnInit {
       role: this.newTask.role,
       assignee: this.newTask.assignee,
       hours: hours,
-      status: "In progress", // Default status for new tasks
+      status: "In progress",
       comments: []
     };
     
-    this.tasks.push(task);
+    // Get all existing tasks
+    const allTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    
+    // Add new task to all tasks
+    allTasks.push(task);
+    
+    // Save updated tasks to localStorage
+    localStorage.setItem('tasks', JSON.stringify(allTasks));
+    
+    // Update current tasks list
+    this.tasks = allTasks.filter((t: Task) => t.projectId === this.currentProject.name);
+    
+    // Update resource assignments
+    this.updateResourceAssignments();
+    
     this.hideAddTaskForm();
   }
   
@@ -217,8 +265,12 @@ export class AddTaskComponent implements OnInit {
       return;
     }
     
-    const task = this.tasks.find(t => t.id === this.currentTaskId);
-    if (task) {
+    // Get all tasks
+    const allTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    
+    // Find and update the task
+    const taskIndex = allTasks.findIndex((t: Task) => t.id === this.currentTaskId);
+    if (taskIndex !== -1) {
       // Get current date in DD-MM-YY format
       const today = new Date();
       const dd = String(today.getDate()).padStart(2, '0');
@@ -233,8 +285,16 @@ export class AddTaskComponent implements OnInit {
         text: this.newComment.trim()
       };
       
-      task.comments.push(comment);
-      this.currentTaskComments.push(comment);
+      allTasks[taskIndex].comments.push(comment);
+      
+      // Save updated tasks
+      localStorage.setItem('tasks', JSON.stringify(allTasks));
+      
+      // Update current tasks list
+      this.tasks = allTasks.filter((t: Task) => t.projectId === this.currentProject.name);
+      
+      // Update modal
+      this.currentTaskComments = [...allTasks[taskIndex].comments];
       this.newComment = '';
     }
   }

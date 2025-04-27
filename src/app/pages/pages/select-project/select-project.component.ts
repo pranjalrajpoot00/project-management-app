@@ -1,6 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+
+interface ProjectDetails {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  teamMembers: string[];
+}
 
 @Component({
   selector: 'app-project-dashboard',
@@ -9,7 +18,7 @@ import { Router } from '@angular/router';
   templateUrl: './select-project.component.html',
   styleUrls: ['./select-project.component.css']
 })
-export class SelectProjectComponent {
+export class SelectProjectComponent implements OnInit {
   // List of projects
   projects: string[] = [
     'I4.0 TPM',
@@ -23,33 +32,80 @@ export class SelectProjectComponent {
     'I4.0 SU'
   ];
 
+  // Project details (mock data)
+  projectDetails: { [key: string]: ProjectDetails } = {
+    'I4.0 TPM': {
+      name: 'I4.0 TPM',
+      description: 'Industry 4.0 Total Productive Maintenance Implementation',
+      startDate: '2024-03-01',
+      endDate: '2024-12-31',
+      status: 'In Progress',
+      teamMembers: ['John Doe', 'Jane Smith', 'Mike Johnson']
+    },
+    'MRO Collab': {
+      name: 'MRO Collab',
+      description: 'Maintenance, Repair, and Overhaul Collaboration Platform',
+      startDate: '2024-02-15',
+      endDate: '2024-11-30',
+      status: 'Planning',
+      teamMembers: ['Sarah Wilson', 'Tom Brown', 'Lisa Davis']
+    },
+    // Add more project details as needed
+  };
+
+  showModal = false;
+  selectedProject: ProjectDetails | null = null;
+
   constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    // Additional initialization logic if needed
+  }
 
   // Method to handle project selection
   selectProject(project: string): void {
-    // You can implement navigation or other logic here
-    console.log('Selected project:', project);
-    // Example of showing an alert similar to the original code
-    alert('Selected project: ' + project);
-    
-    // Navigate to project-specific route (uncomment when routes are set up)
-    // this.router.navigate(['/project', project]);
+    this.selectedProject = this.projectDetails[project] || {
+      name: project,
+      description: 'Project details not available',
+      startDate: 'N/A',
+      endDate: 'N/A',
+      status: 'Not Started',
+      teamMembers: []
+    };
+    this.showModal = true;
+  }
+
+  // Method to close the modal
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedProject = null;
   }
 
   // Method to navigate to home
   navigateToHome(): void {
-    console.log('Navigate to home');
-    // Navigate to home route (uncomment when routes are set up)
-    // this.router.navigate(['/home']);
+    this.router.navigate(['/home']);
   }
 
   // Method to handle logout
   logout(): void {
-    console.log('Logging out');
     // Implement actual logout logic here
-    // Example:
-    // this.authService.logout().subscribe(() => {
-    //   this.router.navigate(['/login']);
-    // });
+    this.router.navigate(['/login']);
+  }
+
+  navigateToAddTask(): void {
+    if (this.selectedProject) {
+      this.router.navigate(['/add-task'], {
+        state: { 
+          project: {
+            name: this.selectedProject.name,
+            description: this.selectedProject.description,
+            startDate: this.selectedProject.startDate,
+            endDate: this.selectedProject.endDate,
+            status: this.selectedProject.status,
+            teamMembers: this.selectedProject.teamMembers
+          }
+        }
+      });
+    }
   }
 }

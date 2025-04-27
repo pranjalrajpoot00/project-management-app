@@ -31,54 +31,103 @@
     </a>
 </div>
 
-<h1 class="page-title">I4.0 TPM</h1>
-
-<div class="tasks-container">
-    <table class="tasks-table">
-        <thead>
-            <tr>
-                <th>Task Name</th>
-                <th>Desc</th>
-                <th>Starts</th>
-                <th>Due date</th>
-                <th>Role</th>
-                <th>Assignee</th>
-                <th>Hours</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let task of tasks">
-                <td>{{ task.name }}</td>
-                <td><i class="fas fa-file file-icon"></i></td>
-                <td>{{ task.starts }}</td>
-                <td>{{ task.due }}</td>
-                <td>{{ task.role }}</td>
-                <td>{{ task.assignee }}</td>
-                <td>{{ task.hours }}</td>
-                <td>
-                    <span class="status" [ngClass]="{
-                        'status-completed': task.status === 'Completed',
-                        'status-review': task.status === 'In review',
-                        'status-testing': task.status === 'In testing',
-                        'status-progress': task.status === 'In progress'
-                    }">{{ task.status }}</span>
-                </td>
-                <td class="action-icons">
-                    <a href="#" (click)="editTask(task.id); $event.preventDefault()">
-                        <i class="fas fa-pencil-alt"></i>
-                    </a>
-                    <a href="#" (click)="openCommentModal(task.id); $event.preventDefault()">
-                        <i class="fas fa-comment"></i>
-                    </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div *ngIf="currentProject" class="page-title">
+    <h1>{{ currentProject.name }}</h1>
+    <p>{{ currentProject.description }}</p>
 </div>
 
-<a href="#" class="add-task-btn" (click)="showAddTaskForm(); $event.preventDefault()">Add Task</a>
+<div *ngIf="!currentProject" class="error-message">
+    <p>No project selected. Please go back and select a project first.</p>
+    <button class="back-btn" (click)="router.navigate(['/select-project'])">
+        <i class="fas fa-arrow-left"></i> Back to Projects
+    </button>
+</div>
+
+<div class="tasks-container" *ngIf="currentProject">
+    <!-- Project Management View -->
+    <div *ngIf="activeTab === 'Project Management'">
+        <table class="tasks-table">
+            <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Desc</th>
+                    <th>Starts</th>
+                    <th>Due date</th>
+                    <th>Role</th>
+                    <th>Assignee</th>
+                    <th>Hours</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of tasks">
+                    <td>{{ task.name }}</td>
+                    <td><i class="fas fa-file file-icon"></i></td>
+                    <td>{{ task.starts }}</td>
+                    <td>{{ task.due }}</td>
+                    <td>{{ task.role }}</td>
+                    <td>{{ task.assignee }}</td>
+                    <td>{{ task.hours }}</td>
+                    <td>
+                        <span class="status" [ngClass]="{
+                            'status-completed': task.status === 'Completed',
+                            'status-review': task.status === 'In review',
+                            'status-testing': task.status === 'In testing',
+                            'status-progress': task.status === 'In progress'
+                        }">{{ task.status }}</span>
+                    </td>
+                    <td class="action-icons">
+                        <a href="#" (click)="editTask(task.id); $event.preventDefault()">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="#" (click)="openCommentModal(task.id); $event.preventDefault()">
+                            <i class="fas fa-comment"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Resource Management View -->
+    <div *ngIf="activeTab === 'Resource Management'" class="resource-management">
+        <table class="resources-table">
+            <thead>
+                <tr>
+                    <th>Member Name</th>
+                    <th>EID</th>
+                    <th>Role</th>
+                    <th>Hours</th>
+                    <th>Assigned Tasks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let resource of resources">
+                    <td>{{ resource.name }}</td>
+                    <td>{{ resource.eid }}</td>
+                    <td>{{ resource.role }}</td>
+                    <td>{{ resource.hours }} hrs</td>
+                    <td>
+                        <div class="assigned-tasks">
+                            <div *ngIf="resource.assignedTasks.length === 0" class="no-tasks">
+                                No tasks assigned
+                            </div>
+                            <div *ngFor="let task of resource.assignedTasks" class="task-item">
+                                <span class="task-name">{{ task.name }}</span>
+                                <span class="task-status" [ngClass]="'status-' + task.status.toLowerCase()">
+                                    {{ task.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<a href="#" class="add-task-btn" (click)="showAddTaskForm(); $event.preventDefault()" *ngIf="activeTab === 'Project Management'">Add Task</a>
 
 <a href="#" class="back-btn">
     <i class="fas fa-arrow-left"></i>
