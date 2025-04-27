@@ -40,12 +40,23 @@
 </button>
 
 <main class="main-content">
-    <h1 class="page-title">SELECT PROJECT</h1>
-    
-    <div class="project-grid">
-        <button *ngFor="let project of projects" class="project-button" (click)="selectProject(project)">
-            {{ project }}
+    <div class="page-header">
+        <h1 class="page-title">SELECT PROJECT</h1>
+        <button class="new-project-btn" (click)="navigateToCreateProject()">
+            <i class="fas fa-plus"></i> New Project
         </button>
+    </div>
+    
+    <div class="project-list">
+        <div *ngFor="let project of projects" class="project-card" (click)="selectProject(project)">
+            <h3>{{ project.name }}</h3>
+            <p>{{ project.description }}</p>
+            <div class="project-details">
+                <span>Start: {{ project.startDate }}</span>
+                <span>End: {{ project.endDate }}</span>
+                <span class="status" [ngClass]="'status-' + project.status.toLowerCase()">{{ project.status }}</span>
+            </div>
+        </div>
     </div>
 </main>
 
@@ -82,7 +93,9 @@
                 <div class="info-group">
                     <label>Team Members:</label>
                     <ul>
-                        <li *ngFor="let member of selectedProject?.teamMembers">{{ member }}</li>
+                        <li *ngFor="let member of selectedProject?.teamMembers">
+                            {{ member.name }} ({{ member.role }})
+                        </li>
                     </ul>
                 </div>
             </div>

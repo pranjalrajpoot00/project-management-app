@@ -34,6 +34,9 @@
 <div *ngIf="currentProject" class="page-title">
     <h1>{{ currentProject.name }}</h1>
     <p>{{ currentProject.description }}</p>
+    <button class="add-member-btn" style="margin-top: 10px;" (click)="showMemberManagement()">
+        <i class="fas fa-user-plus"></i> Add Member
+    </button>
 </div>
 
 <div *ngIf="!currentProject" class="error-message">
@@ -92,6 +95,13 @@
 
     <!-- Resource Management View -->
     <div *ngIf="activeTab === 'Resource Management'" class="resource-management">
+        <div class="resource-header">
+            <h2>Project Team Members</h2>
+            <button class="add-member-btn" (click)="showMemberManagement()">
+                <i class="fas fa-user-plus"></i> Manage Team Members
+            </button>
+        </div>
+        
         <table class="resources-table">
             <thead>
                 <tr>
@@ -100,10 +110,11 @@
                     <th>Role</th>
                     <th>Hours</th>
                     <th>Assigned Tasks</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let resource of resources">
+                <tr *ngFor="let resource of projectResources">
                     <td>{{ resource.name }}</td>
                     <td>{{ resource.eid }}</td>
                     <td>{{ resource.role }}</td>
@@ -120,6 +131,12 @@
                                 </span>
                             </div>
                         </div>
+                    </td>
+                    <td>
+                        <button class="remove-member-btn" (click)="removeMemberFromProject(resource)" 
+                                [disabled]="resource.assignedTasks.length > 0">
+                            <i class="fas fa-user-minus"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -173,11 +190,7 @@
             <span>:</span>
             <select [(ngModel)]="newTask.role">
                 <option value="">Select role</option>
-                <option value="Lead">Lead</option>
-                <option value="UI/UX">UI/UX</option>
-                <option value="Frontend">Frontend</option>
-                <option value="Backend">Backend</option>
-                <option value="QA">QA</option>
+                <option *ngFor="let member of projectResources" [value]="member.role">{{ member.role }}</option>
             </select>
         </div>
         
@@ -186,10 +199,9 @@
             <span>:</span>
             <select [(ngModel)]="newTask.assignee">
                 <option value="">Select assignee</option>
-                <option value="Tejas">Tejas</option>
-                <option value="Kritika">Kritika</option>
-                <option value="Pranjal">Pranjal</option>
-                <option value="Sagar">Sagar</option>
+                <option *ngFor="let member of currentProject.teamMembers" [value]="member.name">
+                    {{ member.name }} ({{ member.role }})
+                </option>
             </select>
         </div>
         
@@ -228,6 +240,36 @@
         <div class="modal-footer">
             <button class="btn btn-secondary" (click)="hideCommentModal()">Close</button>
             <button class="btn btn-primary" (click)="addComment()">Add Comment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Member Management Modal -->
+<div class="modal" [style.display]="showAddMemberModal ? 'flex' : 'none'">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Manage Team Members</h2>
+            <span class="close-btn" (click)="hideAddMemberModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="available-resources">
+                <h3>Available Resources</h3>
+                <div class="resource-list">
+                    <div *ngFor="let resource of availableResources" class="resource-item">
+                        <div class="resource-info">
+                            <span class="resource-name">{{ resource.name }}</span>
+                            <span class="resource-role">{{ resource.role }}</span>
+                            <span class="resource-eid">{{ resource.eid }}</span>
+                        </div>
+                        <button class="add-resource-btn" (click)="addMemberToProject(resource)">
+                            <i class="fas fa-plus"></i> Add to Project
+                        </button>
+                    </div>
+                    <div *ngIf="availableResources.length === 0" class="no-resources">
+                        No available resources to add
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

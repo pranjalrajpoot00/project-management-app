@@ -32,6 +32,7 @@ interface Resource {
   role: string;
   hours: number;
   assignedTasks: Task[];
+  isProjectMember?: boolean;
 }
 
 @Component({
@@ -47,50 +48,8 @@ export class AddTaskComponent implements OnInit {
   currentProject: any = null;
   
   // Resource data
-  resources: Resource[] = [
-    {
-      name: 'Sagar',
-      eid: 'E40096601',
-      role: 'PM',
-      hours: 80,
-      assignedTasks: []
-    },
-    {
-      name: 'Tejas',
-      eid: 'E40096602',
-      role: 'Lead',
-      hours: 100,
-      assignedTasks: []
-    },
-    {
-      name: 'Kritika',
-      eid: 'E40096603',
-      role: 'Developer',
-      hours: 30,
-      assignedTasks: []
-    },
-    {
-      name: 'Tejaswini',
-      eid: 'E40096604',
-      role: 'Developer',
-      hours: 40,
-      assignedTasks: []
-    },
-    {
-      name: 'Thayib',
-      eid: 'E40096605',
-      role: 'Developer',
-      hours: 60,
-      assignedTasks: []
-    },
-    {
-      name: 'Pranjal',
-      eid: 'E40096606',
-      role: 'Developer',
-      hours: 30,
-      assignedTasks: []
-    }
-  ];
+  resources: Resource[] = [];
+  projectResources: Resource[] = [];
   
   // UI state
   activeTab: string = 'Project Management';
@@ -112,6 +71,9 @@ export class AddTaskComponent implements OnInit {
   currentTaskName: string = '';
   currentTaskComments: Comment[] = [];
   newComment: string = '';
+  
+  showAddMemberModal: boolean = false;
+  availableResources: Resource[] = [];
   
   constructor(public router: Router) {
     const navigation = this.router.getCurrentNavigation();
@@ -138,21 +100,87 @@ export class AddTaskComponent implements OnInit {
     } else {
       this.tasks = [];
     }
+
+    // Load all resources
+    this.resources = [
+      {
+        name: 'Sagar',
+        eid: 'E40096601',
+        role: 'PM',
+        hours: 80,
+        assignedTasks: []
+      },
+      {
+        name: 'Tejas',
+        eid: 'E40096602',
+        role: 'Lead',
+        hours: 100,
+        assignedTasks: []
+      },
+      {
+        name: 'Kritika',
+        eid: 'E40096603',
+        role: 'Developer',
+        hours: 30,
+        assignedTasks: []
+      },
+      {
+        name: 'Tejaswini',
+        eid: 'E40096604',
+        role: 'Developer',
+        hours: 40,
+        assignedTasks: []
+      },
+      {
+        name: 'Thayib',
+        eid: 'E40096605',
+        role: 'Developer',
+        hours: 60,
+        assignedTasks: []
+      },
+      {
+        name: 'Pranjal',
+        eid: 'E40096606',
+        role: 'Developer',
+        hours: 30,
+        assignedTasks: []
+      }
+    ];
+
+    // Set available resources (those not in project)
+    this.updateAvailableResources();
+
+    // Filter resources to show only project members
+    if (this.currentProject) {
+      this.projectResources = this.resources.filter(resource => 
+        this.currentProject.teamMembers.some(member => member.name === resource.name)
+      );
+      // Mark resources as project members
+      this.projectResources.forEach(resource => resource.isProjectMember = true);
+    }
   }
   
   updateResourceAssignments(): void {
     // Reset all resource assignments
-    this.resources.forEach(resource => {
+    this.projectResources.forEach(resource => {
       resource.assignedTasks = [];
     });
     
     // Assign tasks to resources
     this.tasks.forEach(task => {
-      const resource = this.resources.find(r => r.name === task.assignee);
+      const resource = this.projectResources.find(r => r.name === task.assignee);
       if (resource) {
         resource.assignedTasks.push(task);
       }
     });
+  }
+  
+  updateAvailableResources(): void {
+    if (this.currentProject) {
+      this.availableResources = this.resources.filter(resource => 
+        !this.currentProject.teamMembers.some(member => member.name === resource.name)
+      );
+    }
   }
   
   setActiveTab(tab: string): void {
@@ -297,5 +325,65 @@ export class AddTaskComponent implements OnInit {
       this.currentTaskComments = [...allTasks[taskIndex].comments];
       this.newComment = '';
     }
+  }
+
+  showMemberManagement(): void {
+    this.showAddMemberModal = true;
+  }
+
+  hideAddMemberModal(): void {
+    this.showAddMemberModal = false;
+  }
+
+  addMemberToProject(resource: Resource): void {
+    if (!this.currentProject) return;
+
+    // Add to project members
+    this.currentProject.teamMembers.push({
+      name: resource.name,
+      role: resource.role
+    });
+
+    // Update localStorage
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    const projectIndex = projects.findIndex((p: any) => p.name === this.currentProject.name);
+    if (projectIndex !== -1) {
+      projects[projectIndex] = this.currentProject;
+      localStorage.setItem('projects', JSON.stringify(projects));
+    }
+
+    // Update local arrays
+    resource.isProjectMember = true;
+    this.projectResources.push(resource);
+    this.updateAvailableResources();
+  }
+
+  removeMemberFromProject(resource: Resource): void {
+    if (!this.currentProject) return;
+
+    // Check if member has any active tasks
+    const hasActiveTasks = this.tasks.some(task => task.assignee === resource.name);
+    if (hasActiveTasks) {
+      alert('Cannot remove member with active tasks. Please reassign their tasks first.');
+      return;
+    }
+
+    // Remove from project members
+    this.currentProject.teamMembers = this.currentProject.teamMembers.filter(
+      member => member.name !== resource.name
+    );
+
+    // Update localStorage
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    const projectIndex = projects.findIndex((p: any) => p.name === this.currentProject.name);
+    if (projectIndex !== -1) {
+      projects[projectIndex] = this.currentProject;
+      localStorage.setItem('projects', JSON.stringify(projects));
+    }
+
+    // Update local arrays
+    resource.isProjectMember = false;
+    this.projectResources = this.projectResources.filter(r => r.name !== resource.name);
+    this.updateAvailableResources();
   }
 }

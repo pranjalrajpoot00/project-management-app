@@ -41,9 +41,7 @@
 
 <!-- Tab Navigation -->
 <div class="tab-navigation">
-    <button [class.active]="activeTab === 'project'" (click)="setActiveTab('project')">Project Management</button>
-    <button [class.active]="activeTab === 'resource'" (click)="setActiveTab('resource')">Resource Management</button>
-    <div class="tab-pointer" [style.left]="activeTab === 'project' ? '190px' : '390px'"></div>
+    <button class="active">Project Management</button>
 </div>
 
 <!-- Home Button -->
@@ -56,32 +54,61 @@
     <h1>NEW PROJECT</h1>
     <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-            <label for="project-name">Name of the Project :</label>
-            <input type="text" id="project-name" formControlName="projectName">
+            <label for="project-name">Name of the Project:</label>
+            <input type="text" id="project-name" formControlName="projectName" 
+                   [class.invalid]="projectForm.get('projectName')?.invalid && projectForm.get('projectName')?.touched">
+            <div class="error-message" *ngIf="projectForm.get('projectName')?.invalid && projectForm.get('projectName')?.touched">
+                Project name is required and must be at least 3 characters long
+            </div>
         </div>
+
         <div class="form-group">
-            <label for="start-date">Start date :</label>
-            <input type="text" id="start-date" formControlName="startDate">
-            <span class="icon" style="margin-left: -30px;">📅</span>
+            <label for="project-description">Description:</label>
+            <textarea id="project-description" formControlName="description" rows="4"
+                      [class.invalid]="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"></textarea>
+            <div class="error-message" *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched">
+                Description is required and must be at least 10 characters long
+            </div>
         </div>
+
         <div class="form-group">
-            <label for="end-date">End date :</label>
-            <input type="text" id="end-date" formControlName="endDate">
-            <span class="icon" style="margin-left: -30px;">📅</span>
+            <label for="start-date">Start date:</label>
+            <input type="date" id="start-date" formControlName="startDate"
+                   [class.invalid]="projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched">
+            <div class="error-message" *ngIf="projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched">
+                Start date is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="end-date">End date:</label>
+            <input type="date" id="end-date" formControlName="endDate"
+                   [class.invalid]="projectForm.get('endDate')?.invalid && projectForm.get('endDate')?.touched">
+            <div class="error-message" *ngIf="projectForm.get('endDate')?.invalid && projectForm.get('endDate')?.touched">
+                End date is required
+            </div>
         </div>
         
-        <div *ngFor="let member of teamMembers; let i = index" class="form-group">
-            <label for="member-{{i}}">Member {{i + 1}} :</label>
-            <div class="member-info">
-                <span class="member-name">{{member.name}}</span>
-                <span class="member-role">{{member.role}}</span>
+        <div class="form-group">
+            <label>Team Members:</label>
+            <div class="member-selection">
+                <select (change)="addMember($any($event.target).value)" class="member-select">
+                    <option value="">Select a team member</option>
+                    <option *ngFor="let member of availableMembers" [value]="member.name">
+                        {{ member.name }} ({{ member.role }})
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="selected-members">
+            <div *ngFor="let member of selectedMembers; let i = index" class="member-info">
+                <span class="member-name">{{ member.name }}</span>
+                <span class="member-role">{{ member.role }}</span>
                 <span class="remove-member" (click)="removeMember(i)">×</span>
             </div>
         </div>
         
-        <button type="button" class="add-member-btn" (click)="openAddMemberDialog()">
-            Add a team member <span class="icon">▼</span>
-        </button>
         <button type="submit" class="submit-btn">Add project</button>
     </form>
 </div>
