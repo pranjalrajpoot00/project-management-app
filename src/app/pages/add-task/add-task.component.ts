@@ -80,6 +80,17 @@ export class AddTaskComponent implements OnInit {
     if (navigation?.extras.state) {
       this.currentProject = navigation.extras.state['project'];
     }
+    // TEMPORARY MOCK: If no project in navigation, use mock data
+    if (!this.currentProject) {
+      this.currentProject = {
+        name: 'Demo Project',
+        description: 'A test project',
+        teamMembers: [
+          { name: 'Tejas', role: 'PM' },
+          { name: 'Kritika', role: 'Developer' }
+        ]
+      };
+    }
   }
   
   ngOnInit(): void {
@@ -147,16 +158,23 @@ export class AddTaskComponent implements OnInit {
       }
     ];
 
+    // Ensure teamMembers exists
+    if (!this.currentProject.teamMembers) {
+      this.currentProject.teamMembers = [];
+    }
+
     // Set available resources (those not in project)
     this.updateAvailableResources();
 
     // Filter resources to show only project members
     if (this.currentProject) {
       this.projectResources = this.resources.filter(resource => 
-        this.currentProject.teamMembers.some(member => member.name === resource.name)
+        this.currentProject.teamMembers.some((member: { name: string; role: string }) => member.name === resource.name)
       );
       // Mark resources as project members
       this.projectResources.forEach(resource => resource.isProjectMember = true);
+    } else {
+      this.projectResources = [];
     }
   }
   
@@ -178,7 +196,8 @@ export class AddTaskComponent implements OnInit {
   updateAvailableResources(): void {
     if (this.currentProject) {
       this.availableResources = this.resources.filter(resource => 
-        !this.currentProject.teamMembers.some(member => member.name === resource.name)
+        // !this.currentProject.teamMembers.some(member => member.name === resource.name)
+        !this.currentProject.teamMembers.some((member: { name: string; role: string }) => member.name === resource.name)
       );
     }
   }
@@ -370,7 +389,7 @@ export class AddTaskComponent implements OnInit {
 
     // Remove from project members
     this.currentProject.teamMembers = this.currentProject.teamMembers.filter(
-      member => member.name !== resource.name
+      (member: { name: string; role: string }) => member.name !== resource.name
     );
 
     // Update localStorage

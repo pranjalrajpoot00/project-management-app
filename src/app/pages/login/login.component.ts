@@ -31,7 +31,8 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       else
       alert('Invalid Credentials.');
-    } else {
+    } 
+    else {
       alert('Please enter both username and password.');
     }
   }
